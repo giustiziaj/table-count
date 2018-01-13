@@ -24,6 +24,7 @@ def parse_arguments():
                         type=str)
     parser.add_argument('-d', '--database',
                         help='database to connect.',
+                        required=True,
                         type=str)
 
     args = parser.parse_args()
