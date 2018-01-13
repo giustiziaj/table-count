@@ -6,7 +6,9 @@ def parse_arguments():
     from argparse import ArgumentParser
     import getpass as gp
     
-    parser = ArgumentParser()
+    parser = ArgumentParser(description='''
+            count the records in each table of a mysql database
+            and print the result in the form TABLE: COUNT''')
 
     parser.add_argument('-H', '--host',
                         help='connect to host.',
