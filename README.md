@@ -2,6 +2,7 @@
 script to count all records in each table in a mysql database
 
 ## Usage
+`./table-count [options]`
 | flag | long form  | function | default |
 | ---- | ---------- | -------- | ------- |
 | -h   | --help     | prints help text | N/A |
