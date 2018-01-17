@@ -32,7 +32,7 @@ def parse_arguments():
 
     args = parser.parse_args()
     if args.p:
-        args.passwd = gp.getpass(prompt='Password for %s: ' % args.user)
+        args.passwd = gp.getpass(prompt='Password for mysql://%s@%s: ' % (args.user,args.host))
     else:
         args.passwd = None
     return args
@@ -67,11 +67,11 @@ def table_count(connection, db):
 ### Main Thread ###
 if __name__ == '__main__':
     args = parse_arguments()
+    connection = get_connection(host=args.host,
+                                user=args.user,
+                                port=args.port,
+                                passwd=args.passwd)
     try:
-        connection = get_connection(host=args.host,
-                                    user=args.user,
-                                    port=args.port,
-                                    passwd=args.passwd)
         for database in args.databases:
             counts = table_count(connection, database)
             print('\n#%s:' % database)
