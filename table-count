@@ -74,9 +74,8 @@ if __name__ == '__main__':
     try:
         for database in args.databases:
             counts = table_count(connection, database)
-            print('\n#%s:' % database)
             for table in counts.keys():
-                print('%s: %s' % (table, counts[table]))
+                print('%s.%s: %s' % (database, table, counts[table]))
 
     finally:
         connection.close()
