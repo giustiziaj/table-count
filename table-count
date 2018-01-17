@@ -14,7 +14,7 @@ def parse_arguments():
                         help='connect to host.',
                         default='localhost',
                         type=str)
-    parser.add_argument('-p', '--port',
+    parser.add_argument('-P', '--port',
                         help='port number to use for connection.',
                         default=3306,
                         type=int)
@@ -22,13 +22,19 @@ def parse_arguments():
                         help='username login if not the current user',
                         default=gp.getuser(),
                         type=str)
+    parser.add_argument('-p',
+                        action='store_true',
+                        help='prompt the user for password')
     parser.add_argument('databases',
                         help='database to connect.',
                         default=None,
                         nargs='*')
 
     args = parser.parse_args()
-    args.passwd = gp.getpass(prompt='Password for %s: ' % args.user)
+    if args.p:
+        args.passwd = gp.getpass(prompt='Password for %s: ' % args.user)
+    else:
+        args.passwd = None
     return args
 
 
