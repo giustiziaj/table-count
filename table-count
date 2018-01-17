@@ -5,7 +5,7 @@ import pymysql as mysql
 def parse_arguments():
     from argparse import ArgumentParser
     import getpass as gp
-    
+
     parser = ArgumentParser(description='''
             count the records in each table of a mysql database
             and print the result in the form TABLE: COUNT''')
@@ -31,31 +31,44 @@ def parse_arguments():
     args.passwd = gp.getpass(prompt='Password for %s: ' % args.user)
     return args
 
+
+def get_connection(host, user, db, port, passwd):
+    try:
+        connection = mysql.connect(host=host,
+                                   user=user,
+                                   db=db,
+                                   port=port,
+                                   passwd=passwd)
+    except mysql.err.OperationalError:
+        exit('Error: Incorrect Password')
+    return connection
+
+
+def table_count(connection):
+    counts = {}
+    try:
+        crsr = connection.cursor()
+        crsr.execute('show tables')
+        tables = crsr.fetchall()
+        for table in tables:
+            crsr.execute('select count(*) from %s' % table[0])
+            counts[table[0]] = crsr.fetchone()[0]
+        return counts
+    except Exception as err:
+        exit('Error: %s' % str(err))
+    finally:
+        connection.close()
+
+
 ### Main Thread ###
 args = parse_arguments()
-counts = {}
 
-try:
-    connection = mysql.connect(host=args.host,
-                               user=args.user,
-                               db=args.database,
-                               port=args.port,
-                               passwd=args.passwd)
-except mysql.err.OperationalError:
-    exit('Error: Incorrect Password')
-
-try:
-    crsr = connection.cursor()
-    crsr.execute('show tables')
-    tables = crsr.fetchall()
-    for table in tables:
-        crsr.execute('select count(*) from %s' % table[0])
-        counts[table[0]] = crsr.fetchone()[0]
-
-except Exception as err:
-    exit('Error: %s' % str(err))
-finally:
-    connection.close()
+connection = get_connection(host=args.host,
+                            user=args.user,
+                            db=args.database,
+                            port=args.port,
+                            passwd=args.passwd)
+counts = table_count(connection)
 
 for table in counts.keys():
     print('%s: %s' % (table, counts[table]))
