@@ -61,16 +61,17 @@ def table_count(connection):
 
 
 ### Main Thread ###
-args = parse_arguments()
+if __name__ == '__main__':
+    args = parse_arguments()
 
-connection = get_connection(host=args.host,
-                            user=args.user,
-                            db=args.database,
-                            port=args.port,
-                            passwd=args.passwd)
-counts = table_count(connection)
+    connection = get_connection(host=args.host,
+                                user=args.user,
+                                db=args.database,
+                                port=args.port,
+                                passwd=args.passwd)
+    counts = table_count(connection)
 
-for table in counts.keys():
-    print('%s: %s' % (table, counts[table]))
+    for table in counts.keys():
+        print('%s: %s' % (table, counts[table]))
 
 
