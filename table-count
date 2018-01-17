@@ -24,7 +24,7 @@ def parse_arguments():
                         type=str)
     parser.add_argument('-d', '--database',
                         help='database to connect.',
-                        required=True,
+                        default=None,
                         type=str)
 
     args = parser.parse_args()
@@ -32,11 +32,10 @@ def parse_arguments():
     return args
 
 
-def get_connection(host, user, db, port, passwd):
+def get_connection(host, user, port, passwd):
     try:
         connection = mysql.connect(host=host,
                                    user=user,
-                                   db=db,
                                    port=port,
                                    passwd=passwd)
     except mysql.err.OperationalError:
@@ -44,10 +43,11 @@ def get_connection(host, user, db, port, passwd):
     return connection
 
 
-def table_count(connection):
+def table_count(connection, db):
     counts = {}
     try:
         crsr = connection.cursor()
+        crsr.execute('use %s' % db)
         crsr.execute('show tables')
         tables = crsr.fetchall()
         for table in tables:
@@ -56,22 +56,23 @@ def table_count(connection):
         return counts
     except Exception as err:
         exit('Error: %s' % str(err))
-    finally:
-        connection.close()
 
 
 ### Main Thread ###
 if __name__ == '__main__':
     args = parse_arguments()
+    try:
+        connection = get_connection(host=args.host,
+                                    user=args.user,
+                                    port=args.port,
+                                    passwd=args.passwd)
+        if args.database is not None:
+            counts = table_count(connection, args.database)
+            for table in counts.keys():
+                print('%s: %s' % (table, counts[table]))
 
-    connection = get_connection(host=args.host,
-                                user=args.user,
-                                db=args.database,
-                                port=args.port,
-                                passwd=args.passwd)
-    counts = table_count(connection)
+    finally:
+        connection.close()
 
-    for table in counts.keys():
-        print('%s: %s' % (table, counts[table]))
-
+    
 
