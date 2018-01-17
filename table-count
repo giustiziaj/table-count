@@ -22,10 +22,10 @@ def parse_arguments():
                         help='username login if not the current user',
                         default=gp.getuser(),
                         type=str)
-    parser.add_argument('-d', '--database',
+    parser.add_argument('databases',
                         help='database to connect.',
                         default=None,
-                        type=str)
+                        nargs='*')
 
     args = parser.parse_args()
     args.passwd = gp.getpass(prompt='Password for %s: ' % args.user)
@@ -66,8 +66,9 @@ if __name__ == '__main__':
                                     user=args.user,
                                     port=args.port,
                                     passwd=args.passwd)
-        if args.database is not None:
-            counts = table_count(connection, args.database)
+        for database in args.databases:
+            counts = table_count(connection, database)
+            print('\n#%s:' % database)
             for table in counts.keys():
                 print('%s: %s' % (table, counts[table]))
 
